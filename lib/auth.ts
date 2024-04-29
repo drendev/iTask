@@ -19,16 +19,17 @@ export const authOptions: NextAuthOptions = {
 
           name: "Credentials",
           credentials: {
-            email: { label: "Email", type: "text", placeholder: "jsmith" },
-            password: { label: "Password", type: "password" }
+            username: { label: "Username", type: "text", placeholder: "jsmith" },
+            password: { label: "Password", type: "password" },
           },
+          
           async authorize(credentials) {
-            if(!credentials?.email || !credentials?.password) {
+            if(!credentials?.username || !credentials?.password) {
                 return null;
             }
             
             const existingUser = await db.user.findUnique({
-                where: { email: credentials.email }
+                where: { username: credentials.username }
             });
 
             if(!existingUser){
@@ -44,30 +45,34 @@ export const authOptions: NextAuthOptions = {
             return {
                 id: `${existingUser.id}`,
                 username: existingUser.username,
-                email: existingUser.email
+                email: existingUser.email,
+                role: existingUser.role
             }
           }
         })
       ],
+
       callbacks: {
         async jwt ({token, user }){
             if(user){
                 return {
                     ...token,
-                    username: user.username
+                    username: user.username,
+                    role: user.role
                 }
             }
             return token
         },
+        
         async session ({session, token}){
             return {
                 ...session, 
                 user: {
                     ...session.user,
-                    username: token.username
-                }
+                    username: token.username,
+                    role: token.role
+                },
             }
         },
-
       }
 }

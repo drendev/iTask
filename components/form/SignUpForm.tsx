@@ -27,6 +27,7 @@ const FormSchema = z
       .min(1, 'Password is required')
       .min(8, 'Password must have than 8 characters'),
     confirmPassword: z.string().min(1, 'Password confirmation is required'),
+    role: z.enum(['user', 'admin']).optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     path: ['confirmPassword'],
@@ -56,6 +57,7 @@ const SignUpForm = () => {
         username: values.username,
         email: values.email,
         password: values.password,
+        role: values.role
       })
     })
 
@@ -83,6 +85,19 @@ const SignUpForm = () => {
                 <FormLabel>Username</FormLabel>
                 <FormControl>
                   <Input placeholder='johndoe' {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name='role'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Role</FormLabel>
+                <FormControl>
+                  <Input placeholder='user or admin only' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
